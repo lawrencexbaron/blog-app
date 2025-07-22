@@ -1,0 +1,116 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ./docker/php
+    container_name: blog-app
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - sphinx
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    networks:
+      - blog-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: blog-mysql
+    environment:
+      MYSQL_DATABASE: blog-app
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - blog-network
+
+  shard1-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: blog_shard1
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    networks:
+      - blog-network
+
+  shard2-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: blog_shard2
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3308:3306"
+    networks:
+      - blog-network
+
+  sphinx:
+    build:
+      context: ./docker/sphinx
+    container_name: blog-sphinx
+    volumes:
+      - ./docker/sphinx:/etc/sphinx
+      - sphinx-data:/var/lib/sphinxsearch/data
+      - sphinx-logs:/var/log/sphinxsearch
+    command: /bin/sh -c "
+      until nc -z blog-mysql 3306; do
+      echo 'Waiting for MySQL...';
+      sleep 2;
+      done;
+      echo 'MySQL is up. Running indexer.';
+      indexer --all &&
+      searchd --nodetach"
+    ports:
+      - "9306:9306"
+    networks:
+      - blog-network
+
+  nginx:
+    image: nginx:latest
+    container_name: blog-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend:/var/www/html
+      - ./frontend/dist:/var/www/html/public
+    depends_on:
+      - app
+    networks:
+      - blog-network
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    networks:
+      - blog-network
+
+volumes:
+  mysql_data:
+  sphinx-data:
+  sphinx-logs:
+  frontend_data:
+    driver: local
+  backend_data:
+    driver: local
+
+networks:
+  blog-network:
+    driver: bridge
