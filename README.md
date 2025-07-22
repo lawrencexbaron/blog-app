@@ -55,6 +55,19 @@ DB_DATABASE=blog-app
 DB_USERNAME=user
 DB_PASSWORD=password
 
+DB_SHARD1_HOST=shard1-mysql
+DB_SHARD1_DATABASE=blog_shard1
+DB_SHARD1_USERNAME=user
+DB_SHARD1_PASSWORD=password
+DB_SHARD1_PORT=3306
+
+DB_SHARD2_HOST=shard2-mysql
+DB_SHARD2_DATABASE=blog_shard2
+DB_SHARD2_USERNAME=user
+DB_SHARD2_PASSWORD=password
+DB_SHARD2_PORT=3306
+
+
 
 docker exec blog-app php artisan key:generate
 docker exec blog-app php artisan migrate --seed
