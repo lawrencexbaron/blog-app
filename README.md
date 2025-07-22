@@ -71,6 +71,12 @@ DB_SHARD2_PORT=3306
 
 docker exec blog-app php artisan key:generate
 docker exec blog-app php artisan migrate --seed
+
+DEFAULT USER:
+email: admin@admin.com
+password: password
+
+
 ```
 
 ### 5. Index data with Sphinx
