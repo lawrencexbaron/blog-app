@@ -7,18 +7,16 @@
 - ✅ MySQL with strict Eloquent models
 - ✅ Many-to-many post/tag relationship
 - ✅ Sphinx full-text search engine integration
-- ✅ Dockerized for local development
-- ✅ Modular structure for scalability
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Laravel 10, MySQL, PHP 8.2
+- **Backend:** Laravel 12, MySQL 8.0, PHP 8.2
 - **Frontend:** Vue 3, Vite, TailwindCSS
 - **Search Engine:** Sphinx (via `sphinxsearch`)
 - **Containerization:** Docker + Docker Compose
-- **Others:** Laravel Sail (optional), RESTful routing, Eloquent ORM
+- **Others:** RESTful routing, Eloquent ORM
 
 ---
 
@@ -27,7 +25,7 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/blog-sphinx-app.git
+git clone https://github.com/lawrencexbaron/blog-app.git
 cd blog-sphinx-app
 ```
 
